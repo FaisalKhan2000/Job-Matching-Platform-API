@@ -1,11 +1,13 @@
 import express, { Express, Request, Response } from "express";
 import authRoutes from "./routes/auth/auth.routes";
+import { errorHandler } from "./middleware/errorHandler";
 
 const app: Express = express();
 const port: number = 3000;
 
 app.use(express.json());
 app.use("/api/auth", authRoutes);
+app.use(errorHandler);
 
 app.get("/", (req: Request, res: Response) => {
   res.json({
