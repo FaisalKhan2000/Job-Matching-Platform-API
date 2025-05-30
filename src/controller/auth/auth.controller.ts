@@ -10,8 +10,31 @@ export const register = catchErrors(
     res: Response,
     next: NextFunction
   ) => {
-    throw new AppError(NOT_FOUND, "jnsmxjanjansja");
-    // const { name, email, password, confirmPassword } = req.body;
+    const { name, email, password, confirmPassword } = req.body;
+
+    // accept and validate input
+    // hash password
+    // save user to database
+    // return response
+
+    // res.json({ name, email });
+  }
+);
+
+export const login = catchErrors(
+  async (
+    req: Request<{}, {}, RegisterInput>,
+    res: Response,
+    next: NextFunction
+  ) => {
+    const { email, password } = req.body;
+
+    // accept and validate input
+    // find user in database
+    // compare password
+    // generate auth token (jwt)
+    // set cookie
+    // return response
 
     // res.json({ name, email });
   }
