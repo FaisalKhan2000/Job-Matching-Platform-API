@@ -1,9 +1,11 @@
 import express, { Express, Request, Response, NextFunction } from "express";
 import authRoutes from "./routes/auth/auth.routes";
 import { errorHandler } from "./middleware/errorHandler";
+import { config } from "dotenv";
+config();
 
 const app: Express = express();
-const port: number = 3000;
+const port = process.env.PORT || 3000;
 
 app.use(express.json());
 
