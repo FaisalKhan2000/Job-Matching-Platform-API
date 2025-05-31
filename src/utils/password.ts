@@ -1,8 +1,7 @@
 import bcrypt from "bcrypt";
 import { AppError } from "./appError";
 import { BAD_REQUEST } from "../constants/http";
-
-const DEFAULT_SALT_ROUNDS = 10;
+import { BCRYPT_SALT_ROUNDS } from "../constants/env";
 
 /**
  * Hashes a password using bcrypt
@@ -11,9 +10,7 @@ const DEFAULT_SALT_ROUNDS = 10;
  */
 export const hashPassword = async (password: string): Promise<string> => {
   try {
-    const saltRounds =
-      parseInt(process.env.SALT_ROUNDS || "") || DEFAULT_SALT_ROUNDS;
-    return await bcrypt.hash(password, saltRounds);
+    return await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
   } catch (error) {
     throw new AppError(
       BAD_REQUEST,

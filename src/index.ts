@@ -1,15 +1,14 @@
+import dotenv from "dotenv";
+dotenv.config();
 import express, { Express, Request, Response, NextFunction } from "express";
 import authRoutes from "./routes/auth/auth.routes";
 import { errorHandler } from "./middleware/errorHandler";
-import { config } from "dotenv";
-config();
+import { PORT } from "./constants/env";
 
 const app: Express = express();
-const port = process.env.PORT || 3000;
 
 app.use(express.json());
 
-// Regular routes
 app.use("/api/auth", authRoutes);
 
 app.get("/", (req: Request, res: Response) => {
@@ -24,6 +23,6 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 app.use(errorHandler);
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });

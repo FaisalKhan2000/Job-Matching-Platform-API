@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { AppError } from "../utils/appError";
 import { BAD_REQUEST, INTERNAL_SERVER_ERROR } from "../constants/http";
 import { z, ZodError } from "zod";
+import { NODE_ENV } from "../constants/env";
 
 interface ErrorResponse {
   message: string;
@@ -44,7 +45,7 @@ export const errorHandler = (
     error: {
       name: error.name,
       message: error.message,
-      stack: process.env.NODE_ENV === "development" ? error.stack : undefined,
+      stack: NODE_ENV === "development" ? error.stack : undefined,
     },
   });
 
@@ -63,7 +64,7 @@ export const errorHandler = (
   // Unknown Error
   const response: ErrorResponse = {
     message: "Internal Server Error",
-    stack: process.env.NODE_ENV === "development" ? error.stack : undefined,
+    stack: NODE_ENV === "development" ? error.stack : undefined,
   };
 
   res.status(INTERNAL_SERVER_ERROR).json(response);
