@@ -134,3 +134,19 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Drizzle
+.env
+.env.*
+!.env.example
+drizzle/.env
+
+# Database
+*.sqlite
+*.sqlite3
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo

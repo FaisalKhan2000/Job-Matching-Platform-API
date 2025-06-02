@@ -1,8 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 import { catchErrors } from "../../utils/catchErrors";
-import { RegisterInput } from "../../schemas/auth.schema";
+import { RegisterInput, registerSchema } from "../../validations/auth.schema";
+import { hashPassword } from "../../utils/password";
 import { AppError } from "../../utils/appError";
-import { NOT_FOUND } from "../../constants/http";
+import { BAD_REQUEST, CREATED } from "../../constants/http";
+import { createToken } from "../../utils/jwt";
 
 export const register = catchErrors(
   async (
@@ -10,14 +12,17 @@ export const register = catchErrors(
     res: Response,
     next: NextFunction
   ) => {
-    const { name, email, password, confirmPassword } = req.body;
+    const { name, email, password } = req.body;
 
-    // accept and validate input
-    // hash password
-    // save user to database
-    // return response
+    // Check if user already exists
 
-    // res.json({ name, email });
+    // Hash password
+
+    // Create new user
+
+    // Generate JWT token
+
+    // Return response
   }
 );
 
