@@ -10,7 +10,7 @@ import { BCRYPT_SALT_ROUNDS } from "../constants/env";
  */
 export const hashPassword = async (password: string): Promise<string> => {
   try {
-    return await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
+    return await bcrypt.hash(password, parseInt(BCRYPT_SALT_ROUNDS));
   } catch (error) {
     throw new AppError(
       BAD_REQUEST,

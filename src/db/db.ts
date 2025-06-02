@@ -1,15 +1,27 @@
-const DB_USER = "postgres";
-const DB_PASS = "admin";
-const DB_HOST = "127.0.0.1";
-const DB_PORT = 5432;
-
 import { drizzle } from "drizzle-orm/node-postgres";
-import { DATABASE_URL } from "../constants/env";
+import { Pool } from "pg";
+import { migrate } from "drizzle-orm/node-postgres/migrator";
 
-// You can specify any property from the node-postgres connection options
-export const db = drizzle({
-  connection: {
-    connectionString: DATABASE_URL,
-    ssl: true,
-  },
+const pool = new Pool({
+  host: "localhost",
+  port: 5432,
+  user: "postgres",
+  password: "admin",
+  database: "job_matching_db",
 });
+
+export const db = drizzle(pool);
+
+export const connectDB = async () => {
+  try {
+    await pool.connect();
+    console.log("Database connected successfully");
+
+    // Run migrations
+    await migrate(db, { migrationsFolder: "drizzle" });
+    console.log("Migrations completed successfully");
+  } catch (error) {
+    console.error("Error connecting to the database:", error);
+    process.exit(1);
+  }
+};

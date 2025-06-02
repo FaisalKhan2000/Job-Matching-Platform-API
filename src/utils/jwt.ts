@@ -4,7 +4,7 @@ import { BAD_REQUEST, UNAUTHORIZED } from "../constants/http";
 import { JWT_EXPIRES_IN } from "../constants/env";
 import { JWT_SECRET } from "../constants/env";
 
-type Payload = {
+export type JwtPayload = {
   userId: string;
   role: string;
   email: string;
@@ -18,7 +18,7 @@ const OPTIONS = { expiresIn: JWT_EXPIRES_IN } as SignOptions;
  * @param payload - User data to encode in token
  * @returns Signed JWT token
  */
-export const createToken = (payload: Payload): string => {
+export const createToken = (payload: JwtPayload): string => {
   try {
     return jwt.sign(payload, SECRET, OPTIONS);
   } catch (error) {
@@ -36,9 +36,9 @@ export const createToken = (payload: Payload): string => {
  * @param token - JWT token to verify
  * @returns Decoded payload
  */
-export const verifyToken = (token: string): Payload => {
+export const verifyToken = (token: string): JwtPayload => {
   try {
-    const decoded = jwt.verify(token, SECRET) as Payload;
+    const decoded = jwt.verify(token, SECRET) as JwtPayload;
     return decoded;
   } catch (error) {
     throw new AppError(

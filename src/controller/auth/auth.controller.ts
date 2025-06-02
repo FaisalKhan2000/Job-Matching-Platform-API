@@ -1,10 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import { catchErrors } from "../../utils/catchErrors";
-import { RegisterInput, registerSchema } from "../../validations/auth.schema";
-import { hashPassword } from "../../utils/password";
-import { AppError } from "../../utils/appError";
-import { BAD_REQUEST, CREATED } from "../../constants/http";
-import { createToken } from "../../utils/jwt";
+import { RegisterInput } from "../../validations/auth.schema";
+import { registerService } from "../../services/auth/auth.service";
+import { CREATED } from "../../constants/http";
 
 export const register = catchErrors(
   async (
@@ -14,15 +12,19 @@ export const register = catchErrors(
   ) => {
     const { name, email, password } = req.body;
 
-    // Check if user already exists
+    const { userWithoutPassword, token } = await registerService({
+      name,
+      email,
+      password,
+    });
 
-    // Hash password
-
-    // Create new user
-
-    // Generate JWT token
-
-    // Return response
+    return res.status(CREATED).json({
+      message: "User registered successfully",
+      data: {
+        user: userWithoutPassword,
+        token,
+      },
+    });
   }
 );
 

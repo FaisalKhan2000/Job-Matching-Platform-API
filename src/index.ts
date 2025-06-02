@@ -4,11 +4,16 @@ import express, { Express, Request, Response, NextFunction } from "express";
 import authRoutes from "./routes/auth/auth.routes";
 import { errorHandler } from "./middleware/errorHandler";
 import { PORT } from "./constants/env";
+import { connectDB } from "./db/db";
 
 const app: Express = express();
 
+// Connect to database
+connectDB();
+
 app.use(express.json());
 
+// Regular routes
 app.use("/api/auth", authRoutes);
 
 app.get("/", (req: Request, res: Response) => {
@@ -21,6 +26,7 @@ app.get("/", (req: Request, res: Response) => {
 app.use((req: Request, res: Response, next: NextFunction) => {
   res.status(404).json({ message: "Route not found" });
 });
+
 app.use(errorHandler);
 
 app.listen(PORT, () => {
