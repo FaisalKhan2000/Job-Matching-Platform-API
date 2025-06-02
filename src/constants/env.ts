@@ -14,3 +14,4 @@ export const BCRYPT_SALT_ROUNDS = getEnv("BCRYPT_SALT_ROUNDS");
 export const JWT_SECRET = getEnv("JWT_SECRET");
 export const JWT_EXPIRES_IN = getEnv("JWT_EXPIRES_IN");
 export const DATABASE_URL = getEnv("DATABASE_URL");
+export const COOKIE_SECRET = getEnv("COOKIE_SECRET");

@@ -5,17 +5,22 @@ import { BAD_REQUEST } from "../../constants/http";
 import { usersTable } from "../../db/tables/user.table";
 import { hashPassword } from "../../utils/password";
 import { createToken, JwtPayload } from "../../utils/jwt";
+import { Response } from "express";
+import { NODE_ENV } from "../../constants/env";
+import { setJWTCookie } from "../../utils/cookie";
 
 type registerServiceType = {
   name: string;
   email: string;
   password: string;
+  res: Response;
 };
 
 export const registerService = async ({
   name,
   email,
   password,
+  res,
 }: registerServiceType) => {
   // check if user already exists
   const existingUser = await db
@@ -42,9 +47,11 @@ export const registerService = async ({
     email: user.email,
     role: "user",
   };
+
   const token = createToken(payload);
 
-  // store token in cookie
+  // set cookie
+  setJWTCookie("token", res, token);
 
   // Return response without password
   const { password: _, ...userWithoutPassword } = user;

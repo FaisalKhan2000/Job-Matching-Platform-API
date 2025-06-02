@@ -16,6 +16,7 @@ export const register = catchErrors(
       name,
       email,
       password,
+      res,
     });
 
     return res.status(CREATED).json({

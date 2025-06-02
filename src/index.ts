@@ -3,8 +3,9 @@ dotenv.config();
 import express, { Express, Request, Response, NextFunction } from "express";
 import authRoutes from "./routes/auth/auth.routes";
 import { errorHandler } from "./middleware/errorHandler";
-import { PORT } from "./constants/env";
+import { COOKIE_SECRET, PORT } from "./constants/env";
 import { connectDB } from "./db/db";
+import cookieParser from "cookie-parser";
 
 const app: Express = express();
 
@@ -12,6 +13,7 @@ const app: Express = express();
 connectDB();
 
 app.use(express.json());
+app.use(cookieParser(COOKIE_SECRET));
 
 // Regular routes
 app.use("/api/auth", authRoutes);
