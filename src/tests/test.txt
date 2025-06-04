@@ -1,0 +1,21 @@
+src/
+└── tests/
+    ├── __mocks__/           # Mock files for external dependencies
+    ├── config/              # Test configuration files
+    │   └── setup.ts         # Test setup configuration
+    ├── fixtures/            # Test data/fixtures
+    │   └── auth.fixture.ts  # Authentication test data
+    ├── helpers/             # Test helper functions
+    │   └── database.ts      # Database test utilities
+    ├── unit/               
+    │   ├── controllers/
+    │   │   └── auth.controller.test.ts
+    │   ├── services/
+    │   │   └── auth.service.test.ts
+    │   └── utils/
+    │       ├── catchErrors.test.ts
+    │       └── cookie.test.ts
+    └── integration/
+        └── auth/
+            ├── register.test.ts
+            └── login.test.ts

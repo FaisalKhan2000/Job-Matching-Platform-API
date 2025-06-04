@@ -10,8 +10,21 @@ export type JwtPayload = {
   email: string;
 };
 
-const SECRET = JWT_SECRET as Secret;
-const OPTIONS = { expiresIn: JWT_EXPIRES_IN } as SignOptions;
+const getSecret = () => JWT_SECRET as Secret;
+const getOptions = () => ({ expiresIn: JWT_EXPIRES_IN } as SignOptions);
+
+const validatePayload = (payload: JwtPayload) => {
+  if (!payload.userId || !payload.role || !payload.email) {
+    throw new AppError(BAD_REQUEST, "Invalid payload: missing required fields");
+  }
+
+  if (Object.values(payload).some((val) => val === null || val === undefined)) {
+    throw new AppError(
+      BAD_REQUEST,
+      "Invalid payload: null or undefined values not allowed"
+    );
+  }
+};
 
 /**
  * Creates a JWT token with the given payload
@@ -20,7 +33,12 @@ const OPTIONS = { expiresIn: JWT_EXPIRES_IN } as SignOptions;
  */
 export const createToken = (payload: JwtPayload): string => {
   try {
-    return jwt.sign(payload, SECRET, OPTIONS);
+    validatePayload(payload);
+    return jwt.sign(payload, getSecret(), {
+      ...getOptions(),
+      // Let jwt.sign handle the iat (issued at) timestamp
+      // It will automatically add different timestamps for each token
+    });
   } catch (error) {
     throw new AppError(
       BAD_REQUEST,
@@ -38,9 +56,14 @@ export const createToken = (payload: JwtPayload): string => {
  */
 export const verifyToken = (token: string): JwtPayload => {
   try {
-    const decoded = jwt.verify(token, SECRET) as JwtPayload;
-    return decoded;
+    const decoded = jwt.verify(token, getSecret()) as JwtPayload & {
+      iat?: number;
+    };
+    const { iat, ...payload } = decoded;
+    validatePayload(payload);
+    return payload;
   } catch (error) {
+    if (error instanceof AppError) throw error;
     throw new AppError(
       UNAUTHORIZED,
       `Token verification failed: ${
