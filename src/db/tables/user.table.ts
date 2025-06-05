@@ -6,4 +6,7 @@ export const usersTable = pgTable("users", {
   name: varchar({ length: 255 }).notNull(),
   email: varchar({ length: 255 }).notNull().unique(),
   password: varchar({ length: 255 }).notNull(),
+  role: varchar({ enum: ["user", "admin"] })
+    .notNull()
+    .default("user"),
 });

@@ -1,8 +1,12 @@
 import { Request, Response, NextFunction } from "express";
 import { catchErrors } from "../../utils/catchErrors";
-import { RegisterInput } from "../../validations/auth.schema";
-import { registerService } from "../../services/auth/auth.service";
-import { CREATED } from "../../constants/http";
+import { LoginInput, RegisterInput } from "../../validations/auth.schema";
+import {
+  loginService,
+  registerService,
+} from "../../services/auth/auth.service";
+import { CREATED, OK } from "../../constants/http";
+import { resetJWTCookie } from "../../utils/cookie";
 
 export const register = catchErrors(
   async (
@@ -31,19 +35,23 @@ export const register = catchErrors(
 
 export const login = catchErrors(
   async (
-    req: Request<{}, {}, RegisterInput>,
+    req: Request<{}, {}, LoginInput>,
     res: Response,
     next: NextFunction
   ) => {
     const { email, password } = req.body;
 
-    // accept and validate input
-    // find user in database
-    // compare password
-    // generate auth token (jwt)
-    // set cookie
-    // return response
+    const { message } = await loginService({ email, password, res });
 
-    // res.json({ name, email });
+    res.status(OK).json({ message });
+  }
+);
+
+export const logout = catchErrors(
+  async (req: Request, res: Response, next: NextFunction) => {
+    // reset cookie
+    resetJWTCookie("token", res);
+
+    res.status(OK).json({ message: "logout successful" });
   }
 );
