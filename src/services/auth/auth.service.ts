@@ -4,18 +4,14 @@ import { AppError } from "../../utils/appError";
 import { BAD_REQUEST, NOT_FOUND } from "../../constants/http";
 import { usersTable } from "../../db/tables/user.table";
 import { comparePassword, hashPassword } from "../../utils/password";
-import { createToken, JwtPayload } from "../../utils/jwt";
+import { createToken } from "../../utils/jwt";
 import { Response } from "express";
-import { NODE_ENV } from "../../constants/env";
 import { setJWTCookie } from "../../utils/cookie";
-import { LoginInput } from "../../validations/auth.schema";
-
-type registerServiceType = {
-  name: string;
-  email: string;
-  password: string;
-  res: Response;
-};
+import {
+  JwtPayload,
+  loginServiceType,
+  registerServiceType,
+} from "../../types/types";
 
 export const registerService = async ({
   name,
@@ -58,12 +54,6 @@ export const registerService = async ({
   const { password: _, ...userWithoutPassword } = user;
 
   return { userWithoutPassword, token };
-};
-
-type loginServiceType = {
-  email: string;
-  password: string;
-  res: Response;
 };
 
 export const loginService = async ({

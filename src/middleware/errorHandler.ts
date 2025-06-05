@@ -3,12 +3,7 @@ import { AppError } from "../utils/appError";
 import { BAD_REQUEST, INTERNAL_SERVER_ERROR } from "../constants/http";
 import { z, ZodError } from "zod";
 import { NODE_ENV } from "../constants/env";
-
-interface ErrorResponse {
-  message: string;
-  errors?: Array<{ message: string }>;
-  stack?: string;
-}
+import { ErrorResponse } from "../types/types";
 
 const handleZodError = (
   res: Response,

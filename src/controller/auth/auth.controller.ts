@@ -1,12 +1,13 @@
 import { Request, Response, NextFunction } from "express";
 import { catchErrors } from "../../utils/catchErrors";
-import { LoginInput, RegisterInput } from "../../validations/auth.schema";
+
 import {
   loginService,
   registerService,
 } from "../../services/auth/auth.service";
 import { CREATED, OK } from "../../constants/http";
 import { resetJWTCookie } from "../../utils/cookie";
+import { RegisterInput, LoginInput } from "../../types/types";
 
 export const register = catchErrors(
   async (
