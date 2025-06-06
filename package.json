@@ -25,6 +25,7 @@
     "drizzle-orm": "^0.44.1",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
+    "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "pg": "^8.16.0",
     "vitest": "^3.2.0",

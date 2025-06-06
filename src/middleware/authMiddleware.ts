@@ -3,6 +3,7 @@ import { catchErrors } from "../utils/catchErrors";
 import { AppError } from "../utils/appError";
 import { FORBIDDEN, UNAUTHORIZED } from "../constants/http";
 import { verifyToken } from "../utils/jwt";
+import { JwtPayload } from "../types/types";
 
 export const authenticateUser = catchErrors(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -26,9 +27,10 @@ export const verifyRole =
         throw new AppError(UNAUTHORIZED, "Authentication required");
       }
 
-      const userRole = req.user.role;
+      // Change this line - role is a string, not an object
+      const role = req.user.role;
 
-      if (!allowedRoles.includes(userRole)) {
+      if (!allowedRoles.includes(role)) {
         throw new AppError(
           FORBIDDEN,
           "You do not have permission to access this resource"

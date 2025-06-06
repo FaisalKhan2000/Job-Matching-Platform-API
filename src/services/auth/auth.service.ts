@@ -41,6 +41,7 @@ export const registerService = async ({
       last_name: lastName,
       email,
       password: hashedPassword,
+      role: "user", // Set default role
     })
     .returning();
 

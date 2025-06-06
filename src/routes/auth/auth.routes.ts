@@ -8,17 +8,13 @@ import {
 import { validateRequest } from "../../middleware/validateRequest";
 import { loginSchema, registerSchema } from "../../validations/auth.schema";
 import { authenticateUser, verifyRole } from "../../middleware/authMiddleware";
+import { authenticateJwt } from "../../config/passport";
 
 const router = express.Router();
 
 router.post("/register", validateRequest(registerSchema), register);
 router.post("/login", validateRequest(loginSchema), login);
 router.get("/logout", logout);
-router.get(
-  "/users/me",
-  authenticateUser,
-  verifyRole(["user", "admin"]),
-  currentUser
-);
+router.get("/users/me", authenticateJwt, verifyRole(["user"]), currentUser);
 
 export default router;

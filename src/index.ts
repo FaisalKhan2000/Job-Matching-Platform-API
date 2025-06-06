@@ -6,6 +6,8 @@ import { errorHandler } from "./middleware/errorHandler";
 import { COOKIE_SECRET, PORT } from "./constants/env";
 import { connectDB } from "./db/db";
 import cookieParser from "cookie-parser";
+import passport from "passport";
+import { configurePassport } from "./config/passport";
 
 const app: Express = express();
 
@@ -14,6 +16,8 @@ connectDB();
 
 app.use(express.json());
 app.use(cookieParser(COOKIE_SECRET));
+app.use(passport.initialize());
+configurePassport(passport);
 
 // Regular routes
 app.use("/api/auth", authRoutes);

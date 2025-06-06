@@ -12,6 +12,8 @@ import {
   INTERNAL_SERVER_ERROR,
 } from "../constants/http";
 import { Response } from "express";
+import { usersTable } from "../db/tables/user.table";
+import { InferModel } from "drizzle-orm";
 
 // service types
 export type registerServiceType = {
