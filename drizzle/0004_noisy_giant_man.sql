@@ -1,1 +1,0 @@
-ALTER TABLE "users" ADD COLUMN "role" varchar DEFAULT 'user' NOT NULL;

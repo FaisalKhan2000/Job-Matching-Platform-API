@@ -14,7 +14,8 @@ import {
 } from "../../types/types";
 
 export const registerService = async ({
-  name,
+  firstName,
+  lastName,
   email,
   password,
   res,
@@ -35,12 +36,17 @@ export const registerService = async ({
   // create new user
   const [user] = await db
     .insert(usersTable)
-    .values({ name, email, password: hashedPassword })
+    .values({
+      first_name: firstName,
+      last_name: lastName,
+      email,
+      password: hashedPassword,
+    })
     .returning();
 
   // create JWT token
   const payload: JwtPayload = {
-    userId: user.id.toString(),
+    userId: user.user_id,
     email: user.email,
     role: "user",
   };
@@ -74,7 +80,7 @@ export const loginService = async ({
 
   // JWT payload
   const payload = {
-    userId: user.id.toString(),
+    userId: user.user_id,
     email: user.email,
     role: user.role,
   };

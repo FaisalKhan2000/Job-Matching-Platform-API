@@ -5,36 +5,15 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1748847396605,
-      "tag": "0000_curly_hammerhead",
+      "when": 1749213429650,
+      "tag": "0000_soft_paladin",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1748847544876,
-      "tag": "0001_concerned_emma_frost",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1748848138998,
-      "tag": "0002_violet_warstar",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1748848635836,
-      "tag": "0003_silent_the_anarchist",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1749110729223,
-      "tag": "0004_noisy_giant_man",
+      "when": 1749213714680,
+      "tag": "0001_certain_richard_fisk",
       "breakpoints": true
     }
   ]

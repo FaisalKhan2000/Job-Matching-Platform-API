@@ -15,10 +15,11 @@ export const register = catchErrors(
     res: Response,
     next: NextFunction
   ) => {
-    const { name, email, password } = req.body;
+    const { firstName, lastName, email, password } = req.body;
 
     const { userWithoutPassword, token } = await registerService({
-      name,
+      firstName,
+      lastName,
       email,
       password,
       res,
@@ -54,5 +55,13 @@ export const logout = catchErrors(
     resetJWTCookie("token", res);
 
     res.status(OK).json({ message: "logout successful" });
+  }
+);
+
+export const currentUser = catchErrors(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const data = req.user;
+
+    res.status(OK).json({ data });
   }
 );

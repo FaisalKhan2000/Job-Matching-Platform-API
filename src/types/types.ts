@@ -15,7 +15,8 @@ import { Response } from "express";
 
 // service types
 export type registerServiceType = {
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
   res: Response;

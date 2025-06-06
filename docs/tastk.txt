@@ -1,0 +1,2 @@
+1. authenticate users by implementing auth middleware // done
+2. complete all user routes
