@@ -4,6 +4,7 @@ import {
   BAD_REQUEST,
   INTERNAL_SERVER_ERROR,
   NOT_FOUND,
+  UNAUTHORIZED,
 } from "../../constants/http";
 import { db } from "../../db/db";
 import { usersTable } from "../../db/tables/user.table";
@@ -12,8 +13,13 @@ import {
   JwtPayload,
   loginServiceType,
   registerServiceType,
+  requestPasswordResetInput,
+  requestPasswordResetServiceType,
+  resetPasswordServiceType,
+  SendEmailVerificationServiceType,
   updateCurrentUserPasswordServiceType,
   updateCurrentUserServiceType,
+  verifyEmailServiceType,
 } from "../../types/types";
 import { AppError } from "../../utils/appError";
 import { setJWTCookie } from "../../utils/cookie";
@@ -211,9 +217,7 @@ export const updateCurrentUserPasswordService = async ({
 
 export const SendEmailVerificationService = async ({
   userId,
-}: {
-  userId: string;
-}) => {
+}: SendEmailVerificationServiceType) => {
   // Find user email first
   const [user] = await db
     .select({
@@ -280,4 +284,162 @@ export const SendEmailVerificationService = async ({
       "Failed to send verification email"
     );
   }
+};
+
+export const verifyEmailService = async ({
+  userId,
+  token,
+}: verifyEmailServiceType) => {
+  // Find user email first
+  const [user] = await db
+    .select({
+      email: usersTable.email,
+      email_verified: usersTable.email_verified,
+      email_verification_token: usersTable.email_verification_token,
+      email_verification_expires_at: usersTable.email_verification_expires_at,
+    })
+    .from(usersTable)
+    .where(eq(usersTable.user_id, userId));
+
+  if (!user) {
+    throw new AppError(NOT_FOUND, "User not found");
+  }
+
+  if (user.email_verified) {
+    throw new AppError(BAD_REQUEST, "Email already verified");
+  }
+
+  // Check if token matches
+  if (user.email_verification_token !== token) {
+    throw new AppError(UNAUTHORIZED, "Invalid verification token");
+  }
+
+  // Check if token has expired
+  const now = new Date();
+  if (
+    user.email_verification_expires_at &&
+    user.email_verification_expires_at < now
+  ) {
+    throw new AppError(UNAUTHORIZED, "Verification token has expired");
+  }
+
+  //  Update the user: mark email as verified and clear token
+  await db
+    .update(usersTable)
+    .set({
+      email_verified: true,
+      email_verification_token: null,
+      email_verification_expires_at: null,
+    })
+    .where(eq(usersTable.user_id, userId))
+    .execute();
+
+  return { message: "Email successfully verified" };
+};
+
+export const requestPasswordResetService = async ({
+  userId,
+}: requestPasswordResetServiceType) => {
+  // find user email first
+  const [user] = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.user_id, userId));
+
+  if (!user) {
+    throw new AppError(NOT_FOUND, "User not found");
+  }
+
+  if (!user.email_verified) {
+    throw new AppError(BAD_REQUEST, "Email not verified");
+  }
+
+  const { token, expiresIn } = generateSecureToken();
+
+  await db
+    .update(usersTable)
+    .set({
+      password_reset_token: token,
+      password_reset_expires_at: expiresIn,
+    })
+    .where(eq(usersTable.user_id, userId));
+
+  // Send verification email
+  try {
+    await sendEmail({
+      from: {
+        address: "hello@demomailtrap.com",
+        name: "Mailtrap Test",
+      },
+      to: [user.email],
+      subject: "Verify Your Email",
+      text: `Your password reset code is: ${token}`,
+      category: "Email Verification",
+      sandbox: NODE_ENV !== "production",
+    });
+
+    return {
+      message: "Verification email sent successfully",
+    };
+  } catch (error) {
+    // Rollback token if email fails
+    await db.update(usersTable).set({
+      password_reset_token: null,
+      password_reset_expires_at: null,
+    });
+
+    throw new AppError(
+      INTERNAL_SERVER_ERROR,
+      "Failed to send verification email"
+    );
+  }
+};
+
+export const resetPasswordService = async ({
+  userId,
+  password,
+  token,
+}: resetPasswordServiceType) => {
+  // find user first
+  const [user] = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.user_id, userId));
+
+  if (!user) {
+    throw new AppError(NOT_FOUND, "User not found");
+  }
+
+  if (!user.email_verified) {
+    throw new AppError(BAD_REQUEST, "Email not verified");
+  }
+
+  if (user.password_reset_token !== token) {
+    throw new AppError(UNAUTHORIZED, "Invalid verification token");
+  }
+  const now = new Date();
+  if (user.password_reset_expires_at && user.password_reset_expires_at < now) {
+    throw new AppError(UNAUTHORIZED, "Verification token has expired");
+  }
+
+  const isSamePassword = await comparePassword(password, user.password);
+
+  if (isSamePassword)
+    throw new AppError(
+      400,
+      "New password must be different from the current password"
+    );
+
+  const hashedPassword = await hashPassword(password);
+
+  await db
+    .update(usersTable)
+    .set({
+      password: hashedPassword,
+      password_reset_token: null,
+      password_reset_expires_at: null,
+    })
+    .where(eq(usersTable.user_id, userId));
+
+  return { message: "Password Reset Successful" };
 };

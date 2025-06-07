@@ -13,6 +13,8 @@ import {
 } from "../constants/http";
 import { loginSchema, registerSchema } from "../validations/auth.schema";
 import {
+  requestPasswordResetSchema,
+  resetPasswordSchema,
   updateCurrentUserPasswordSchema,
   updateUserSchema,
 } from "../validations/user.schema";
@@ -48,6 +50,25 @@ export type updateCurrentUserPasswordServiceType = {
   password: string;
 };
 
+export type SendEmailVerificationServiceType = {
+  userId: string;
+};
+
+export type verifyEmailServiceType = {
+  userId: string;
+  token: string;
+};
+
+export type requestPasswordResetServiceType = {
+  userId: string;
+};
+
+export type resetPasswordServiceType = {
+  userId: string;
+  password: string;
+  token: string;
+};
+
 // validation types
 export type RegisterInput = z.infer<typeof registerSchema>;
 
@@ -58,6 +79,12 @@ export type updateUserInput = z.infer<typeof updateUserSchema>;
 export type updateUserPasswordInput = z.infer<
   typeof updateCurrentUserPasswordSchema
 >;
+
+export type requestPasswordResetInput = z.infer<
+  typeof requestPasswordResetSchema
+>;
+
+export type resetPasswordInput = z.infer<typeof resetPasswordSchema>;
 
 // middleware types
 export type ErrorResponse = {
@@ -83,8 +110,8 @@ export type SendEmailInput = {
   subject: string;
   text?: string;
   html?: string;
-  category: 'Email Verification' | 'Password Reset',
-  sandbox: boolean,
+  category: "Email Verification" | "Password Reset";
+  sandbox: boolean;
 };
 
 // statuscode types

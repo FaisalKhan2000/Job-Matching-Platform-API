@@ -1,21 +1,30 @@
 import { NextFunction, Request, Response } from "express";
-import { BAD_REQUEST, CREATED, OK } from "../../constants/http";
+import { catchErrors } from "../../utils/catchErrors";
 import {
   currentUserService,
   loginService,
   registerService,
+  requestPasswordResetService,
+  resetPasswordService,
   SendEmailVerificationService,
   updateCurrentUserPasswordService,
   updateCurrentUserService,
+  verifyEmailService,
 } from "../../services/auth/auth.service";
+import { BAD_REQUEST, CREATED, NOT_FOUND, OK } from "../../constants/http";
+import { resetJWTCookie } from "../../utils/cookie";
 import {
   LoginInput,
   RegisterInput,
+  requestPasswordResetInput,
+  resetPasswordInput,
   updateUserInput,
   updateUserPasswordInput,
 } from "../../types/types";
-import { catchErrors } from "../../utils/catchErrors";
-import { resetJWTCookie } from "../../utils/cookie";
+import { AppError } from "../../utils/appError";
+import { db } from "../../db/db";
+import { usersTable } from "../../db/tables/user.table";
+import { eq } from "drizzle-orm";
 
 export const register = catchErrors(
   async (
@@ -135,27 +144,63 @@ export const updateCurrentUserPassword = catchErrors(
 );
 
 export const requestPasswordReset = catchErrors(
-  async (req: Request, res: Response, next: NextFunction) => {}
+  async (
+    req: Request<{}, {}, requestPasswordResetInput>,
+    res: Response,
+    next: NextFunction
+  ) => {
+    const userId = req.user?.userId!;
+
+    const { message } = await requestPasswordResetService({ userId });
+
+    res.status(OK).json({ success: true, message });
+  }
 );
 
 export const resetPassword = catchErrors(
-  async (req: Request, res: Response, next: NextFunction) => {}
+  async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.user?.userId!;
+    const token = req.params.token;
+    const { password } = req.body;
+
+    if (!token) {
+      throw new AppError(BAD_REQUEST, "Reset token is required");
+    }
+
+    const { message } = await resetPasswordService({
+      userId,
+      password,
+      token,
+    });
+
+    res.status(OK).json({ success: true, message });
+  }
 );
 
 export const sendEmailVerificationCode = catchErrors(
   async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.user?.userId!;
 
-    const {message} = await SendEmailVerificationService({userId})
+    const { message } = await SendEmailVerificationService({ userId });
 
     return res.status(OK).json({
-      success: true, message
-    })
+      success: true,
+      message,
+    });
   }
 );
 
 export const verifyEmail = catchErrors(
   async (req: Request, res: Response, next: NextFunction) => {
-    
+    const userId = req.user?.userId!;
+    const token = req.params.token as string;
+
+    if (!token) {
+      throw new AppError(BAD_REQUEST, "Verification token is required");
+    }
+
+    const { message } = await verifyEmailService({ userId, token });
+
+    res.status(OK).json({ success: true, message });
   }
 );
