@@ -1,0 +1,1 @@
+ALTER TABLE "users" ALTER COLUMN "email_verification_token" SET DATA TYPE varchar(64);

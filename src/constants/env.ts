@@ -15,3 +15,5 @@ export const JWT_SECRET = getEnv("JWT_SECRET");
 export const JWT_EXPIRES_IN = getEnv("JWT_EXPIRES_IN");
 export const DATABASE_URL = getEnv("DATABASE_URL");
 export const COOKIE_SECRET = getEnv("COOKIE_SECRET");
+export const MAILTRAP_SECRET = getEnv("MAILTRAP_SECRET");
+export const MAILTRAP_INBOX_ID = getEnv("MAILTRAP_INBOX_ID");

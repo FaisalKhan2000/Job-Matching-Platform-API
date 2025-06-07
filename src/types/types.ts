@@ -12,8 +12,10 @@ import {
   INTERNAL_SERVER_ERROR,
 } from "../constants/http";
 import { Response } from "express";
-import { usersTable } from "../db/tables/user.table";
-import { InferModel } from "drizzle-orm";
+import {
+  updateCurrentUserPasswordSchema,
+  updateUserSchema,
+} from "../validations/user.schema";
 
 // service types
 export type registerServiceType = {
@@ -29,10 +31,33 @@ export type loginServiceType = {
   res: Response;
 };
 
+export type currentUserServiceType = {
+  userId: string;
+  res: Response;
+};
+
+export type updateCurrentUserServiceType = {
+  userId: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+};
+
+export type updateCurrentUserPasswordServiceType = {
+  userId: string;
+  password: string;
+};
+
 // validation types
 export type RegisterInput = z.infer<typeof registerSchema>;
 
 export type LoginInput = z.infer<typeof loginSchema>;
+
+export type updateUserInput = z.infer<typeof updateUserSchema>;
+
+export type updateUserPasswordInput = z.infer<
+  typeof updateCurrentUserPasswordSchema
+>;
 
 // middleware types
 export type ErrorResponse = {
@@ -46,6 +71,20 @@ export type JwtPayload = {
   userId: string;
   role: string;
   email: string;
+};
+
+// mail input
+export type SendEmailInput = {
+  from: {
+    address: string;
+    name: string;
+  };
+  to: string[];
+  subject: string;
+  text?: string;
+  html?: string;
+  category: 'Email Verification' | 'Password Reset',
+  sandbox: boolean,
 };
 
 // statuscode types

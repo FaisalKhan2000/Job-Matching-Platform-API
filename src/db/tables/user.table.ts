@@ -1,3 +1,4 @@
+import { relations } from "drizzle-orm";
 import {
   boolean,
   pgTable,
@@ -30,8 +31,22 @@ export const usersTable = pgTable("users", {
   last_name: varchar({ length: 100 }), // nullable
   role: varchar({ length: 20 }).notNull().default("user"),
   is_active: boolean().default(true),
+  email_verified: boolean().default(false),
+  email_verification_token: varchar({ length: 64 }),
+  email_verification_expires_at: timestamp(),
   email_verified_at: timestamp(),
   last_login_at: timestamp(),
   created_at: timestamp().defaultNow(),
   updated_at: timestamp().defaultNow(),
 });
+
+export const users = usersTable;
+
+// Prepare queries
+// export const userQueries = {
+//   findFirst: async (userId: string) => ({
+//     user_id: true,
+//     email: true,
+//     email_verified: true,
+//   }),
+// };

@@ -1,2 +1,2 @@
-1. authenticate users by implementing auth middleware // done
+1. Use Mailtrap, Ethereal Email, or another email testing tool.
 2. complete all user routes
