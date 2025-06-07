@@ -1,17 +1,12 @@
 import { eq } from "drizzle-orm";
-import { db } from "../../db/db";
-import { AppError } from "../../utils/appError";
+import { sendEmail } from "../../configs/mailtrap";
 import {
   BAD_REQUEST,
   INTERNAL_SERVER_ERROR,
   NOT_FOUND,
-  OK,
 } from "../../constants/http";
+import { db } from "../../db/db";
 import { usersTable } from "../../db/tables/user.table";
-import { comparePassword, hashPassword } from "../../utils/password";
-import { createToken } from "../../utils/jwt";
-import { Response } from "express";
-import { setJWTCookie } from "../../utils/cookie";
 import {
   currentUserServiceType,
   JwtPayload,
@@ -20,8 +15,11 @@ import {
   updateCurrentUserPasswordServiceType,
   updateCurrentUserServiceType,
 } from "../../types/types";
+import { AppError } from "../../utils/appError";
+import { setJWTCookie } from "../../utils/cookie";
 import { generateSecureToken } from "../../utils/generateSecureToken";
-import { sendEmail } from "../../configs/mailtrap";
+import { createToken } from "../../utils/jwt";
+import { comparePassword, hashPassword } from "../../utils/password";
 
 import { NODE_ENV } from "../../constants/env";
 

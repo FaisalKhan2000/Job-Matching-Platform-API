@@ -1,9 +1,8 @@
-import { Request, Response, NextFunction } from "express";
-import { catchErrors } from "../utils/catchErrors";
-import { AppError } from "../utils/appError";
+import { NextFunction, Request, Response } from "express";
 import { FORBIDDEN, UNAUTHORIZED } from "../constants/http";
+import { AppError } from "../utils/appError";
+import { catchErrors } from "../utils/catchErrors";
 import { verifyToken } from "../utils/jwt";
-import { JwtPayload } from "../types/types";
 
 export const authenticateUser = catchErrors(
   async (req: Request, res: Response, next: NextFunction) => {

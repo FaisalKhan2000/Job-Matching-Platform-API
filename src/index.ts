@@ -1,13 +1,14 @@
 import dotenv from "dotenv";
 dotenv.config();
-import express, { Express, Request, Response, NextFunction } from "express";
-import authRoutes from "./routes/auth/auth.routes";
-import { errorHandler } from "./middleware/errorHandler";
-import { COOKIE_SECRET, PORT } from "./constants/env";
-import { connectDB } from "./db/db";
 import cookieParser from "cookie-parser";
+import express, { Express, NextFunction, Request, Response } from "express";
 import passport from "passport";
 import { configurePassport } from "./configs/passport";
+import { COOKIE_SECRET, PORT } from "./constants/env";
+import { connectDB } from "./db/db";
+import { errorHandler } from "./middleware/errorHandler";
+import authRoutes from "./routes/auth/auth.routes";
+
 
 const app: Express = express();
 

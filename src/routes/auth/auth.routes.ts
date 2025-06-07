@@ -1,17 +1,17 @@
 import express from "express";
+import { authenticateJwt } from "../../configs/passport";
 import {
-  register,
+  currentUser,
   login,
   logout,
-  currentUser,
+  register,
+  sendEmailVerificationCode,
   updateCurrentUser,
   updateCurrentUserPassword,
-  sendEmailVerificationCode,
 } from "../../controller/auth/auth.controller";
+import { verifyRole } from "../../middleware/authMiddleware";
 import { validateRequest } from "../../middleware/validateRequest";
 import { loginSchema, registerSchema } from "../../validations/auth.schema";
-import { authenticateUser, verifyRole } from "../../middleware/authMiddleware";
-import { authenticateJwt } from "../../configs/passport";
 import {
   updateCurrentUserPasswordSchema,
   updateUserSchema,

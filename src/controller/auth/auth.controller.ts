@@ -1,6 +1,5 @@
-import { Request, Response, NextFunction } from "express";
-import { catchErrors } from "../../utils/catchErrors";
-
+import { NextFunction, Request, Response } from "express";
+import { BAD_REQUEST, CREATED, OK } from "../../constants/http";
 import {
   currentUserService,
   loginService,
@@ -9,20 +8,14 @@ import {
   updateCurrentUserPasswordService,
   updateCurrentUserService,
 } from "../../services/auth/auth.service";
-import { BAD_REQUEST, CREATED, INTERNAL_SERVER_ERROR, NOT_FOUND, OK, UNAUTHORIZED } from "../../constants/http";
-import { resetJWTCookie } from "../../utils/cookie";
 import {
-  RegisterInput,
   LoginInput,
+  RegisterInput,
   updateUserInput,
   updateUserPasswordInput,
 } from "../../types/types";
-import { generateSecureToken } from "../../utils/generateSecureToken";
-import { db } from "../../db/db";
-import { usersTable } from "../../db/tables/user.table";
-import { eq } from "drizzle-orm";
-import { sendEmail } from "../../configs/mailtrap";
-import { AppError } from "../../utils/appError";
+import { catchErrors } from "../../utils/catchErrors";
+import { resetJWTCookie } from "../../utils/cookie";
 
 export const register = catchErrors(
   async (

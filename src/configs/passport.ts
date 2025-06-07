@@ -1,10 +1,10 @@
+import { Request } from "express";
 import passport, { PassportStatic } from "passport";
-import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
-import { Request, Response, NextFunction } from "express";
+import { ExtractJwt, Strategy as JwtStrategy } from "passport-jwt";
 import { JWT_SECRET } from "../constants/env";
+import { UNAUTHORIZED } from "../constants/http";
 import { JwtPayload } from "../types/types";
 import { AppError } from "../utils/appError";
-import { UNAUTHORIZED } from "../constants/http";
 
 // Custom extractor for signed cookies
 const cookieExtractor = (req: Request): string | null => {

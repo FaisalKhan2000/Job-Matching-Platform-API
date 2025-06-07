@@ -1,9 +1,9 @@
-import { Request, Response, NextFunction } from "express";
-import { AppError } from "../utils/appError";
-import { BAD_REQUEST, INTERNAL_SERVER_ERROR } from "../constants/http";
+import { NextFunction, Request, Response } from "express";
 import { z, ZodError } from "zod";
 import { NODE_ENV } from "../constants/env";
+import { BAD_REQUEST, INTERNAL_SERVER_ERROR } from "../constants/http";
 import { ErrorResponse } from "../types/types";
+import { AppError } from "../utils/appError";
 
 const handleZodError = (
   res: Response,

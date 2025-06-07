@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
-import { AppError } from "./appError";
-import { BAD_REQUEST } from "../constants/http";
 import { BCRYPT_SALT_ROUNDS } from "../constants/env";
+import { BAD_REQUEST } from "../constants/http";
+import { AppError } from "./appError";
 
 /**
  * Hashes a password using bcrypt

@@ -1,9 +1,8 @@
 import jwt, { Secret, SignOptions } from "jsonwebtoken";
-import { AppError } from "./appError";
+import { JWT_EXPIRES_IN, JWT_SECRET } from "../constants/env";
 import { BAD_REQUEST, UNAUTHORIZED } from "../constants/http";
-import { JWT_EXPIRES_IN } from "../constants/env";
-import { JWT_SECRET } from "../constants/env";
 import { JwtPayload } from "../types/types";
+import { AppError } from "./appError";
 
 const getSecret = () => JWT_SECRET as Secret;
 const getOptions = () => ({ expiresIn: JWT_EXPIRES_IN } as SignOptions);

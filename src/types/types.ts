@@ -1,17 +1,17 @@
-import { loginSchema, registerSchema } from "../validations/auth.schema";
+import { Response } from "express";
 import { OK, z } from "zod/dist/types";
 import {
   BAD_REQUEST,
-  UNAUTHORIZED,
-  FORBIDDEN,
-  NOT_FOUND,
-  CREATED,
   CONFLICT,
-  UNPROCESSABLE_CONTENT,
-  TOO_MANY_REQUESTS,
+  CREATED,
+  FORBIDDEN,
   INTERNAL_SERVER_ERROR,
+  NOT_FOUND,
+  TOO_MANY_REQUESTS,
+  UNAUTHORIZED,
+  UNPROCESSABLE_CONTENT,
 } from "../constants/http";
-import { Response } from "express";
+import { loginSchema, registerSchema } from "../validations/auth.schema";
 import {
   updateCurrentUserPasswordSchema,
   updateUserSchema,

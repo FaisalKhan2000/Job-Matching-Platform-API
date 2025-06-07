@@ -1,6 +1,5 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { comparePassword, hashPassword } from "../../../utils/password";
-import { AppError } from "../../../utils/appError";
 
 describe("Password Utils", () => {
   const testPassword = "TestPassword123!";

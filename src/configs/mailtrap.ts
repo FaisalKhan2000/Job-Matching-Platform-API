@@ -1,6 +1,6 @@
-import Nodemailer from "nodemailer";
 import { MailtrapTransport } from "mailtrap";
-import { MAILTRAP_INBOX_ID, MAILTRAP_SECRET } from "../constants/env";
+import Nodemailer from "nodemailer";
+import { MAILTRAP_SECRET } from "../constants/env";
 import { SendEmailInput } from "../types/types";
 
 const TOKEN = MAILTRAP_SECRET;

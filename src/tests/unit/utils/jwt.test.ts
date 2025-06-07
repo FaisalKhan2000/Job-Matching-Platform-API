@@ -1,7 +1,9 @@
-import { describe, it, expect, vi } from "vitest";
 import jwt from "jsonwebtoken";
+import { afterEach } from "node:test";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { JwtPayload } from "../../../types/types";
 import { AppError } from "../../../utils/appError";
-import { createToken, JwtPayload, verifyToken } from "../../../utils/jwt";
+import { createToken, verifyToken } from "../../../utils/jwt";
 
 describe("JWT Utils", () => {
   beforeEach(() => {
