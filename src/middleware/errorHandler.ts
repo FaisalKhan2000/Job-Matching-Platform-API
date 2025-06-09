@@ -4,6 +4,7 @@ import { NODE_ENV } from "../constants/env";
 import { BAD_REQUEST, INTERNAL_SERVER_ERROR } from "../constants/http";
 import { ErrorResponse } from "../types/types";
 import { AppError } from "../utils/appError";
+import { logger } from "../configs/winston";
 
 const handleZodError = (
   res: Response,
@@ -33,6 +34,12 @@ export const errorHandler = (
   res: Response,
   next: NextFunction
 ) => {
+  logger.error("Unhandled Error", {
+    message: error.message,
+    stack: error.stack,
+    path: req.originalUrl,
+    method: req.method,
+  });
   // Enhanced error logging
   console.error({
     path: req.path,

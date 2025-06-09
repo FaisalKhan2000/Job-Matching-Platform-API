@@ -8,7 +8,8 @@ import { COOKIE_SECRET, PORT } from "./constants/env";
 import { connectDB } from "./db/db";
 import { errorHandler } from "./middleware/errorHandler";
 import authRoutes from "./routes/auth/auth.routes";
-
+import path from "path";
+import { appendFileSync } from "fs";
 
 const app: Express = express();
 
@@ -21,6 +22,7 @@ app.use(passport.initialize());
 configurePassport(passport);
 
 // Regular routes
+
 app.use("/api/auth", authRoutes);
 
 app.get("/", (req: Request, res: Response) => {

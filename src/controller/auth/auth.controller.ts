@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { catchErrors } from "../../utils/catchErrors";
+import { BAD_REQUEST, CREATED, OK } from "../../constants/http";
 import {
   currentUserService,
   loginService,
@@ -11,20 +11,17 @@ import {
   updateCurrentUserService,
   verifyEmailService,
 } from "../../services/auth/auth.service";
-import { BAD_REQUEST, CREATED, NOT_FOUND, OK } from "../../constants/http";
-import { resetJWTCookie } from "../../utils/cookie";
 import {
   LoginInput,
   RegisterInput,
   requestPasswordResetInput,
-  resetPasswordInput,
   updateUserInput,
   updateUserPasswordInput,
 } from "../../types/types";
 import { AppError } from "../../utils/appError";
-import { db } from "../../db/db";
-import { usersTable } from "../../db/tables/user.table";
-import { eq } from "drizzle-orm";
+import { catchErrors } from "../../utils/catchErrors";
+import { resetJWTCookie } from "../../utils/cookie";
+import { logger } from "../../configs/winston";
 
 export const register = catchErrors(
   async (
@@ -34,12 +31,19 @@ export const register = catchErrors(
   ) => {
     const { firstName, lastName, email, password } = req.body;
 
+    logger.info("Registration attempt", { email });
+
     const { publicUser, token } = await registerService({
       firstName,
       lastName,
       email,
       password,
       res,
+    });
+
+    logger.info("User registered successfully", {
+      userId: publicUser.user_id,
+      email: publicUser.email,
     });
 
     return res.status(CREATED).json({
@@ -59,8 +63,18 @@ export const login = catchErrors(
     next: NextFunction
   ) => {
     const { email, password } = req.body;
+    logger.info("Login attempt", { email });
 
-    const { message } = await loginService({ email, password, res });
+    const { message, publicUser } = await loginService({
+      email,
+      password,
+      res,
+    });
+
+    logger.info("User LoggedIn successfully", {
+      userId: publicUser.user_id,
+      email: publicUser.email,
+    });
 
     res.status(OK).json({ message });
   }
@@ -68,8 +82,14 @@ export const login = catchErrors(
 
 export const logout = catchErrors(
   async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.user?.userId!;
+
+    logger.info("logout attempt", { userId });
+
     // reset cookie
     resetJWTCookie("token", res);
+
+    logger.info("User LoggedOut successfully", { userId });
 
     res.status(OK).json({ message: "logout successful" });
   }
@@ -79,8 +99,12 @@ export const currentUser = catchErrors(
   async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.user?.userId!;
 
+    logger.info("currentUser called", { userId });
+
     // find in database
     const user = await currentUserService({ userId, res });
+
+    logger.info("currentUser fetched user", { userId, userIdFound: !!user });
 
     res.status(OK).json(user);
   }
@@ -95,25 +119,35 @@ export const updateCurrentUser = catchErrors(
     const userId = req.user?.userId!;
     const { firstName, lastName, email } = req.body;
 
-    if (!firstName && !lastName && !email) {
-      return res.status(BAD_REQUEST).json({
-        success: false,
-        message: "Please provide at least one field to update",
-      });
-    }
-
-    const updatedUser = await updateCurrentUserService({
+    logger.info("updateCurrentUser called", {
       userId,
       firstName,
       lastName,
       email,
     });
 
+    if (!firstName && !lastName && !email) {
+      logger.warn("No fields provided to update", { userId });
+      return res.status(BAD_REQUEST).json({
+        success: false,
+        message: "Please provide at least one field to update",
+      });
+    }
+
+    const safeUser = await updateCurrentUserService({
+      userId,
+      firstName,
+      lastName,
+      email,
+    });
+
+    logger.info("User profile updated successfully", { userId });
+
     res.status(OK).json({
       success: true,
       message: "Profile updated successfully",
       data: {
-        user: updatedUser,
+        user: safeUser,
       },
     });
   }
@@ -128,10 +162,14 @@ export const updateCurrentUserPassword = catchErrors(
     const userId = req.user?.userId!;
     const { password } = req.body;
 
+    logger.info("Password update requested", { userId });
+
     const updatedUser = await updateCurrentUserPasswordService({
       userId,
       password,
     });
+
+    logger.info("Password updated successfully", { userId });
 
     res.status(OK).json({
       success: true,
@@ -150,28 +188,32 @@ export const requestPasswordReset = catchErrors(
     next: NextFunction
   ) => {
     const userId = req.user?.userId!;
+    logger.info("Password reset requested", { userId });
 
     const { message } = await requestPasswordResetService({ userId });
 
+    logger.info("Password reset request sent successfully", { userId });
     res.status(OK).json({ success: true, message });
   }
 );
 
 export const resetPassword = catchErrors(
   async (req: Request, res: Response, next: NextFunction) => {
-    const userId = req.user?.userId!;
     const token = req.params.token;
-    const { password } = req.body;
-
     if (!token) {
       throw new AppError(BAD_REQUEST, "Reset token is required");
     }
 
+    const userId = req.user?.userId!;
+    logger.info("Password reset attempt", { userId, token });
+
     const { message } = await resetPasswordService({
       userId,
-      password,
+      password: req.body.password,
       token,
     });
+
+    logger.info("Password reset successful", { userId });
 
     res.status(OK).json({ success: true, message });
   }
@@ -180,6 +222,7 @@ export const resetPassword = catchErrors(
 export const sendEmailVerificationCode = catchErrors(
   async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.user?.userId!;
+    logger.info("Sending email verification code", { userId });
 
     const { message } = await SendEmailVerificationService({ userId });
 
