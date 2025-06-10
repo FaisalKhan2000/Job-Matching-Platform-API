@@ -3,6 +3,8 @@ import { FORBIDDEN, UNAUTHORIZED } from "../constants/http";
 import { AppError } from "../utils/appError";
 import { catchErrors } from "../utils/catchErrors";
 import { verifyToken } from "../utils/jwt";
+import { Role } from "../constants/user";
+import { logger } from "../configs/winston";
 
 export const authenticateUser = catchErrors(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -19,17 +21,23 @@ export const authenticateUser = catchErrors(
 );
 
 export const verifyRole =
-  (allowedRoles: Array<string>) =>
+  (allowedRoles: Role[]) =>
   (req: Request, res: Response, next: NextFunction) => {
     try {
       if (!req.user) {
         throw new AppError(UNAUTHORIZED, "Authentication required");
       }
 
-      // Change this line - role is a string, not an object
-      const role = req.user.role;
+      const userRole = req.user.role as Role;
 
-      if (!allowedRoles.includes(role)) {
+      // Log the role check for debugging
+      logger.debug("Role verification", {
+        userRole,
+        allowedRoles,
+        hasAccess: allowedRoles.includes(userRole),
+      });
+
+      if (!allowedRoles.includes(userRole)) {
         throw new AppError(
           FORBIDDEN,
           "You do not have permission to access this resource"

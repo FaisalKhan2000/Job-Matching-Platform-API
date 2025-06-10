@@ -1,26 +1,27 @@
 import express from "express";
-import { authenticateJwt } from "../../configs/passport";
+import { authenticateJwt } from "../configs/passport";
 import {
-  currentUser,
   login,
   logout,
   register,
   requestPasswordReset,
   resetPassword,
   sendEmailVerificationCode,
-  updateCurrentUser,
-  updateCurrentUserPassword,
   verifyEmail,
-} from "../../controller/auth/auth.controller";
-import { verifyRole } from "../../middleware/authMiddleware";
-import { validateRequest } from "../../middleware/validateRequest";
-import { loginSchema, registerSchema } from "../../validations/auth.schema";
+} from "../controller/auth.controller";
+import { verifyRole } from "../middleware/authMiddleware";
+import { validateRequest } from "../middleware/validateRequest";
+import { loginSchema, registerSchema } from "../validations/auth.schema";
 import {
   requestPasswordResetSchema,
   resetPasswordSchema,
   updateCurrentUserPasswordSchema,
   updateUserSchema,
-} from "../../validations/user.schema";
+} from "../validations/user.schema";
+import { currentUser } from "../controller/user.controller";
+import { updateCurrentUser } from "../controller/user.controller";
+import { updateCurrentUserPassword } from "../controller/user.controller";
+import { ROLES } from "../constants/user";
 
 const router = express.Router();
 
@@ -40,12 +41,17 @@ router.get("/logout", authenticateJwt, logout);
  * Endpoints for getting and updating the authenticated user's profile
  * Requires: JWT authentication and 'user' role
  */
-router.get("/users/me", authenticateJwt, verifyRole(["user"]), currentUser);
+router.get(
+  "/users/me",
+  authenticateJwt,
+  verifyRole([ROLES.USER, ROLES.ADMIN, ROLES.RECRUITER]),
+  currentUser
+);
 router.patch(
   "/users/me",
   validateRequest(updateUserSchema),
   authenticateJwt,
-  verifyRole(["user"]),
+  verifyRole([ROLES.USER, ROLES.ADMIN, ROLES.RECRUITER]),
   updateCurrentUser
 );
 
@@ -59,7 +65,7 @@ router.patch(
   "/users/me/password",
   validateRequest(updateCurrentUserPasswordSchema),
   authenticateJwt,
-  verifyRole(["user"]),
+  verifyRole([ROLES.USER, ROLES.ADMIN, ROLES.RECRUITER]),
   updateCurrentUserPassword
 );
 
@@ -74,7 +80,7 @@ router.patch(
 router.get(
   "/password-reset/request",
   authenticateJwt,
-  verifyRole(["user"]),
+  verifyRole([ROLES.USER, ROLES.ADMIN, ROLES.RECRUITER]),
   requestPasswordReset
 );
 
@@ -83,7 +89,7 @@ router.post(
   "/password-reset/confirm/:token",
   validateRequest(resetPasswordSchema),
   authenticateJwt,
-  verifyRole(["user"]),
+  verifyRole([ROLES.USER, ROLES.ADMIN, ROLES.RECRUITER]),
   resetPassword
 );
 
@@ -98,7 +104,7 @@ router.post(
 router.get(
   "/verify-email/send",
   authenticateJwt,
-  verifyRole(["user"]),
+  verifyRole([ROLES.USER, ROLES.ADMIN, ROLES.RECRUITER]),
   sendEmailVerificationCode
 );
 
@@ -106,7 +112,7 @@ router.get(
 router.post(
   "/verify-email/:token",
   authenticateJwt,
-  verifyRole(["user"]),
+  verifyRole([ROLES.USER, ROLES.ADMIN, ROLES.RECRUITER]),
   verifyEmail
 );
 

@@ -7,9 +7,9 @@ import { configurePassport } from "./configs/passport";
 import { COOKIE_SECRET, PORT } from "./constants/env";
 import { connectDB } from "./db/db";
 import { errorHandler } from "./middleware/errorHandler";
-import authRoutes from "./routes/auth/auth.routes";
-import path from "path";
-import { appendFileSync } from "fs";
+import authRoutes from "./routes/auth.routes";
+import userRoutes from "./routes/user.routes";
+import companyRoutes from "./routes/company.routes";
 
 const app: Express = express();
 
@@ -24,6 +24,8 @@ configurePassport(passport);
 // Regular routes
 
 app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/companies", companyRoutes);
 
 app.get("/", (req: Request, res: Response) => {
   res.json({

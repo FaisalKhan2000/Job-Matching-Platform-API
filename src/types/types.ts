@@ -18,8 +18,11 @@ import {
   updateCurrentUserPasswordSchema,
   updateUserSchema,
 } from "../validations/user.schema";
+import { companySchema } from "../validations/company.schema";
 
 // service types
+
+// auth
 export type registerServiceType = {
   firstName: string;
   lastName: string;
@@ -50,6 +53,10 @@ export type updateCurrentUserPasswordServiceType = {
   password: string;
 };
 
+export type promoteToRecruiterServiceType = {
+  userId: string;
+};
+
 export type SendEmailVerificationServiceType = {
   userId: string;
 };
@@ -69,7 +76,19 @@ export type resetPasswordServiceType = {
   token: string;
 };
 
+// company
+export type createCompanyServiceType = {
+  userId: string;
+  company: createCompanyInput;
+};
+
+export type getCompanyServiceType = {
+  companyId: string;
+};
+
 // validation types
+
+// user
 export type RegisterInput = z.infer<typeof registerSchema>;
 
 export type LoginInput = z.infer<typeof loginSchema>;
@@ -85,6 +104,17 @@ export type requestPasswordResetInput = z.infer<
 >;
 
 export type resetPasswordInput = z.infer<typeof resetPasswordSchema>;
+
+// company
+export type createCompanyInput = z.infer<typeof companySchema>;
+
+export type listCompaniesInput = {
+  search?: string;
+  page?: number;
+  limit?: number;
+  founded_year?: number;
+  company_size?: string;
+};
 
 // middleware types
 export type ErrorResponse = {
