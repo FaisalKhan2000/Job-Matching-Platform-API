@@ -3,9 +3,11 @@ import { catchErrors } from "../utils/catchErrors";
 import {
   createCompanyService,
   getCompanyService,
+  getRecruiterCompanyService,
+  listCompaniesService,
 } from "../services/company.service";
 import { BAD_REQUEST, CREATED, OK } from "../constants/http";
-import { createCompanyInput } from "../types/types";
+import { createCompanyInput, listCompaniesInput } from "../types/types";
 import { AppError } from "../utils/appError";
 import { db } from "../db/db";
 import { companiesTable } from "../db/tables/company.table";
@@ -53,15 +55,6 @@ export const getCompanyController = catchErrors(
   }
 );
 
-type queryType = {
-  search?: string;
-  page?: string;
-  limit?: string;
-  founded_year?: string;
-  company_size?: string;
-};
-
-/*
 export const listCompaniesController = catchErrors(
   async (
     req: Request<{}, {}, {}, listCompaniesInput>,
@@ -92,82 +85,96 @@ export const listCompaniesController = catchErrors(
     });
   }
 );
-*/
+
 // Search or list companies
-export const listCompaniesController = catchErrors(
-  async (req: Request, res: Response, next: NextFunction) => {
-    // search
-    // filter
-    // pagination
+// export const listCompaniesController = catchErrors(
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     // search
+//     // filter
+//     // pagination
 
-    const {
-      search,
-      page = "1",
-      limit = "10",
-      founded_year,
-      company_size,
-    }: queryType = req.query;
+//     const {
+//       search,
+//       page = "1",
+//       limit = "10",
+//       founded_year,
+//       company_size,
+//     }: queryType = req.query;
 
-    const pageNum = Math.max(parseInt(page, 10), 1);
-    const limitNum = Math.min(Math.max(parseInt(limit, 10), 1), 100); // max 100 per page
-    // To calculate the starting point (how many rows to skip) for the current page.
-    // Page 1: (1 - 1) * 10 = 0 → Skip 0 rows
-    // Page 2: (2 - 1) * 10 = 10 → Skip 10 rows
-    // Page 3: (3 - 1) * 10 = 20 → Skip 20 rows
-    const offset = (pageNum - 1) * limitNum;
+//     const pageNum = Math.max(parseInt(page, 10), 1);
+//     const limitNum = Math.min(Math.max(parseInt(limit, 10), 1), 100); // max 100 per page
+//     // To calculate the starting point (how many rows to skip) for the current page.
+//     // Page 1: (1 - 1) * 10 = 0 → Skip 0 rows
+//     // Page 2: (2 - 1) * 10 = 10 → Skip 10 rows
+//     // Page 3: (3 - 1) * 10 = 20 → Skip 20 rows
+//     const offset = (pageNum - 1) * limitNum;
 
-    // dynamic filters
-    const filters = [];
+//     // dynamic filters
+//     const filters = [];
 
-    // search
-    if (search) {
-      const likeSearch = `%${search.toLowerCase()}%`;
+//     // search
+//     if (search) {
+//       const likeSearch = `%${search.toLowerCase()}%`;
 
-      filters.push(
-        or(
-          ilike(companiesTable.name, likeSearch),
-          ilike(companiesTable.description, likeSearch),
-          ilike(companiesTable.website, likeSearch)
-        )
-      );
-    }
+//       filters.push(
+//         or(
+//           ilike(companiesTable.name, likeSearch),
+//           ilike(companiesTable.description, likeSearch),
+//           ilike(companiesTable.website, likeSearch)
+//         )
+//       );
+//     }
 
-    // filters
-    if (founded_year) {
-      filters.push(eq(companiesTable.founded_year, parseInt(founded_year)));
-    }
-    if (company_size) {
-      filters.push(eq(companiesTable.company_size, company_size));
-    }
+//     // filters
+//     if (founded_year) {
+//       filters.push(eq(companiesTable.founded_year, parseInt(founded_year)));
+//     }
+//     if (company_size) {
+//       filters.push(eq(companiesTable.company_size, company_size));
+//     }
 
-    // Query total count for pagination
-    const [{ count: total }] = await db
-      .select({ count: count() })
-      .from(companiesTable)
-      .where(filters.length ? and(...filters) : undefined);
+//     // Query total count for pagination
+//     const [{ count: total }] = await db
+//       .select({ count: count() })
+//       .from(companiesTable)
+//       .where(filters.length ? and(...filters) : undefined);
 
-    // Fetch paginated data
-    const companies = await db
-      .select()
-      .from(companiesTable)
-      .where(filters.length ? and(...filters) : undefined)
-      .limit(limitNum)
-      .offset(offset);
+//     // Fetch paginated data
+//     const companies = await db
+//       .select()
+//       .from(companiesTable)
+//       .where(filters.length ? and(...filters) : undefined)
+//       .limit(limitNum)
+//       .offset(offset);
 
-    res.json({
-      success: true,
-      total: Number(total),
-      page: pageNum,
-      limit: limitNum,
-      data: companies,
-      totalPages: Math.ceil(Number(total) / limitNum),
-    });
-  }
-);
+//     res.json({
+//       success: true,
+//       total: Number(total),
+//       page: pageNum,
+//       limit: limitNum,
+//       data: companies,
+//       totalPages: Math.ceil(Number(total) / limitNum),
+//     });
+//   }
+// );
 
 // Get company associated with a recruiter
 export const getRecruiterCompanyController = catchErrors(
-  async (req: Request, res: Response, next: NextFunction) => {}
+  async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      throw new AppError(BAD_REQUEST, "User ID is required");
+    }
+
+    const company = await getRecruiterCompanyService({ userId });
+
+    return res.status(OK).json({
+      success: true,
+      message: "Company fetched successfully",
+      data: company,
+    });
+  }
 );
 
 // Update an existing company

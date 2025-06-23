@@ -86,6 +86,14 @@ export type getCompanyServiceType = {
   companyId: string;
 };
 
+export type listCompaniesInput = {
+  search?: string;
+  page?: number;
+  limit?: number;
+  founded_year?: string;
+  company_size?: string;
+};
+
 // validation types
 
 // user
@@ -107,14 +115,6 @@ export type resetPasswordInput = z.infer<typeof resetPasswordSchema>;
 
 // company
 export type createCompanyInput = z.infer<typeof companySchema>;
-
-export type listCompaniesInput = {
-  search?: string;
-  page?: number;
-  limit?: number;
-  founded_year?: number;
-  company_size?: string;
-};
 
 // middleware types
 export type ErrorResponse = {

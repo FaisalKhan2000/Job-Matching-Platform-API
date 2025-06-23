@@ -9,10 +9,26 @@ import { companySchema } from "../validations/company.schema";
 import {
   createCompanyController,
   getCompanyController,
+  getRecruiterCompanyController,
   listCompaniesController,
 } from "../controller/company.controller";
 
 const router = express.Router();
+
+// Recruiter Routes (R)
+router.get(
+  "/company",
+  authenticateJwt,
+  verifyRole([ROLES.RECRUITER]),
+  getRecruiterCompanyController
+);
+router.post(
+  "/",
+  validateRequest(companySchema),
+  authenticateJwt,
+  verifyRole([ROLES.RECRUITER, ROLES.ADMIN]),
+  createCompanyController
+);
 
 // Public routes (P)
 router.get(
@@ -23,14 +39,5 @@ router.get(
 );
 // GET /api/companies?search=tech&page=2&limit=5&founded_year=2020
 router.get("/", listCompaniesController);
-
-// Recruiter Routes (R)
-router.post(
-  "/",
-  validateRequest(companySchema),
-  authenticateJwt,
-  verifyRole([ROLES.RECRUITER, ROLES.ADMIN]),
-  createCompanyController
-);
 
 export default router;

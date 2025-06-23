@@ -5,10 +5,10 @@ import {
   getCompanyServiceType,
   listCompaniesInput,
 } from "../types/types";
-import { and, eq, ilike, or, sql } from "drizzle-orm";
+import { and, eq, ilike, count, or, sql } from "drizzle-orm";
 import { AppError } from "../utils/appError";
-import { BAD_REQUEST } from "../constants/http";
-import { count } from "console";
+import { BAD_REQUEST, FORBIDDEN } from "../constants/http";
+import { usersTable } from "../db/tables/user.table";
 
 export const createCompanyService = async ({
   userId,
@@ -53,6 +53,96 @@ export const getCompanyService = async ({
 
   if (!company) {
     throw new AppError(BAD_REQUEST, "no companies found");
+  }
+
+  return company;
+};
+
+export const listCompaniesService = async ({
+  search,
+  page = 1,
+  limit = 10,
+  founded_year,
+  company_size,
+}: listCompaniesInput) => {
+  const pageNum = Math.max(page, 1);
+  const limitNum = Math.min(Math.max(limit, 1), 100); //  max 100 per page
+  // To calculate the starting point (how many rows to skip) for the current page.
+  // Page 1: (1 - 1) * 10 = 0 → Skip 0 rows
+  // Page 2: (2 - 1) * 10 = 10 → Skip 10 rows
+  // Page 3: (3 - 1) * 10 = 20 → Skip 20 rows
+  const offset = (pageNum - 1) * limitNum;
+
+  // dynamic filters
+  const filters = [];
+
+  // search
+  if (search) {
+    const likeSearch = `%${search.toLowerCase()}%`;
+
+    filters.push(
+      or(
+        ilike(companiesTable.name, likeSearch),
+        ilike(companiesTable.description, likeSearch),
+        ilike(companiesTable.website, likeSearch)
+      )
+    );
+  }
+
+  // filters
+  if (founded_year) {
+    filters.push(eq(companiesTable.founded_year, parseInt(founded_year)));
+  }
+  if (company_size) {
+    filters.push(eq(companiesTable.company_size, company_size));
+  }
+
+  // Query total count for pagination
+  const [{ count: total }] = await db
+    .select({ count: count() })
+    .from(companiesTable)
+    .where(filters.length ? and(...filters) : undefined);
+
+  // Fetch paginated data
+  const companies = await db
+    .select()
+    .from(companiesTable)
+    .where(filters.length ? and(...filters) : undefined)
+    .limit(limitNum)
+    .offset(offset);
+
+  return {
+    companies,
+    pagination: {
+      total: Number(total),
+      page: pageNum,
+      limit: limitNum,
+      totalPages: Math.ceil(Number(total) / limitNum),
+    },
+  };
+};
+
+export const getRecruiterCompanyService = async ({
+  userId,
+}: {
+  userId: string;
+}) => {
+  const [user] = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.user_id, userId));
+
+  if (!user) {
+    throw new AppError(BAD_REQUEST, "User not found");
+  }
+
+  const [company] = await db
+    .select()
+    .from(companiesTable)
+    .where(eq(companiesTable.created_by, user.user_id));
+
+  if (!company) {
+    throw new AppError(BAD_REQUEST, "Recruiter hasn't created a company");
   }
 
   return company;
